@@ -1,0 +1,22 @@
+{
+  "name": "Generative 2.0",
+  "id": "1473755602042511953",
+  "api": "1.0.0",
+  "main": "code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figma"
+  ],
+  "ui": "ui.html",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://stylerpro.ru",
+      "https://www.stylerpro.ru",
+      "https://storage.yandexcloud.net",
+      "https://api-libi.ru"
+    ],
+    "reasoning": "Плагин загружает изображения из JSON-данных со специфических доменов и взаимодействует с API. Доступ к этим доменам необходим для работы с данными."
+  }
+}

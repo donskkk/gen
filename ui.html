@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Generative 2.0</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      
+      body {
+        font-size: 11px;
+        color: #333;
+        background-color: #f5f5f5;
+        padding: 0;
+        overflow: hidden;
+      }
+      
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      
+      .header {
+        background-color: #fff;
+        border-bottom: 1px solid #e5e5e5;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .header h1 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .logo {
+        width: 24px;
+        height: 24px;
+        background-color: #0d99ff;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        margin-right: 8px;
+      }
+      
+      .title-container {
+        display: flex;
+        align-items: center;
+      }
+      
+      .content {
+        flex: 1;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        background-color: #f8f8f8;
+        overflow-y: auto;
+      }
+      
+      .upload-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+        width: 100%;
+        max-width: 320px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      
+      .upload-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 24px;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+      
+      h2 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      
+      p {
+        color: #666;
+        margin-bottom: 16px;
+        line-height: 1.4;
+      }
+      
+      .file-input-container {
+        position: relative;
+        width: 100%;
+        margin-bottom: 16px;
+      }
+      
+      .file-input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #0d99ff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.2s;
+      }
+      
+      .file-input-label:hover {
+        background-color: #0088ee;
+      }
+      
+      input[type="file"] {
+        position: absolute;
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        z-index: -1;
+      }
+      
+      .form-group {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        text-align: left;
+        font-weight: 500;
+      }
+      
+      .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+      
+      .form-group textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+      
+      .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #0d99ff;
+      }
+      
+      .submit-button {
+        background-color: #0d99ff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        width: 100%;
+      }
+      
+      .submit-button:hover {
+        background-color: #0088ee;
+      }
+      
+      .submit-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+      
+      .loading {
+        margin-top: 20px;
+        display: none;
+      }
+      
+      .loading-text {
+        margin-top: 8px;
+        color: #666;
+      }
+      
+      .spinner {
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #0d99ff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+      
+      .success-message {
+        color: #28a745;
+        margin-top: 16px;
+        display: none;
+      }
+      
+      .error-message {
+        color: #dc3545;
+        margin-top: 16px;
+        display: none;
+      }
+      
+      .file-name {
+        margin-top: 8px;
+        font-size: 10px;
+        color: #666;
+        word-break: break-all;
+        display: none;
+      }
+      
+      .instructions {
+        margin-top: 20px;
+        font-size: 10px;
+        color: #888;
+        text-align: center;
+      }
+      
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      
+      .footer {
+        padding: 8px 16px;
+        background-color: #fff;
+        border-top: 1px solid #e5e5e5;
+        color: #888;
+        font-size: 10px;
+        text-align: center;
+      }
+      
+      /* Стилизация полос прокрутки */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+      }
+      
+      /* Добавляем стили для таймера ожидания */
+      .waiting-container {
+        display: none;
+        margin-top: 20px;
+        text-align: center;
+      }
+      
+      .timer {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 16px 0;
+        color: #0d99ff;
+      }
+      
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 10px 0 20px;
+      }
+      
+      .progress-bar-fill {
+        height: 100%;
+        background-color: #0d99ff;
+        width: 0%;
+        transition: width 1s linear;
+      }
+      
+      .waiting-text {
+        margin-bottom: 10px;
+        color: #555;
+      }
+      
+      /* Стили для кнопки повтора */
+      .retry-button {
+        margin-top: 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        width: 100%;
+      }
+      
+      .retry-button:hover {
+        background-color: #218838;
+      }
+      
+      .retry-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="title-container">
+          <div class="logo">G</div>
+          <h1>Generative 2.0</h1>
+        </div>
+      </header>
+      
+      <div class="content">
+        <div class="upload-container">
+          <div class="upload-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 9H15V3H9V9H5L12 16L19 9ZM5 18V20H19V18H5Z" fill="#888"/>
+            </svg>
+          </div>
+          
+          <h2>Загрузите Excel файл</h2>
+          <p>Выберите файл с данными для генерации шаблонов</p>
+          
+          <div class="form-group">
+            <label for="promptInput">Пользовательский промт (опционально)</label>
+            <textarea id="promptInput" placeholder="Введите ваш промт..."></textarea>
+          </div>
+          
+          <div class="file-input-container">
+            <label for="fileInput" class="file-input-label">Выбрать Excel файл</label>
+            <input type="file" id="fileInput" accept=".xlsx,.xls" />
+            <div id="fileName" class="file-name"></div>
+          </div>
+          
+          <div class="form-group">
+            <label for="itemsCount">Количество товаров</label>
+            <input type="number" id="itemsCount" placeholder="Введите количество товаров" min="1" />
+          </div>
+          
+          <form id="uploadForm">
+            <button type="submit" id="submitButton" class="submit-button" disabled>Отправить</button>
+          </form>
+          
+          <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <div class="loading-text">Обработка данных...</div>
+          </div>
+          
+          <!-- Добавляем контейнер для таймера ожидания -->
+          <div class="waiting-container" id="waitingContainer">
+            <div class="waiting-text">Ожидание обработки данных</div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+            <div class="timer" id="timer">00:00</div>
+            <div class="waiting-text">Оставшееся время</div>
+          </div>
+          
+          <div class="success-message" id="successMessage">
+            Данные успешно отправлены!
+          </div>
+          
+          <div class="error-message" id="errorMessage">
+            Ошибка при обработке файла
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer">
+        © 2025 Generative 2.0
+      </div>
+    </div>
+    
+    <script>
+      // Глобальные переменные
+      let currentPrompt = "";
+      let selectedFile = null;
+      let itemsCount = 0;
+      
+      // Глобальные переменные для таймера
+      let timerInterval;
+      let remainingTime;
+      let operationId = '';
+      let requestAttempted = false;
+      let totalTime = 0;
+      
+      // Функция для обновления UI
+      function updateUI(message) {
+        const loadingElement = document.querySelector('.loading');
+        const successMessage = document.querySelector('.success-message');
+        const errorMessage = document.querySelector('.error-message');
+        const fileNameElement = document.querySelector('.file-name');
+        const submitButton = document.querySelector('.submit-button');
+        const itemsCountInput = document.getElementById('itemsCount');
+        
+        if (loadingElement) {
+          loadingElement.style.display = message.type === 'waiting' ? 'block' : 'none';
+        }
+        
+        if (successMessage) {
+          successMessage.style.display = message.type === 'complete' ? 'block' : 'none';
+          if (message.type === 'complete') {
+            successMessage.textContent = message.message;
+          }
+        }
+        
+        if (errorMessage) {
+          errorMessage.style.display = message.type === 'error' ? 'block' : 'none';
+          if (message.type === 'error') {
+            errorMessage.textContent = message.message;
+          }
+        }
+        
+        if (fileNameElement) {
+          fileNameElement.style.display = selectedFile ? 'block' : 'none';
+          if (selectedFile) {
+            fileNameElement.textContent = selectedFile.name;
+          }
+        }
+        
+        if (submitButton) {
+          submitButton.disabled = !selectedFile || !itemsCount || message.type === 'waiting';
+        }
+      }
+      
+      // Функция для форматирования времени
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+      }
+      
+      // Функция для обновления прогресс-бара
+      function updateProgressBar(totalTime, remainingTime) {
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progress = ((totalTime - remainingTime) / totalTime) * 100;
+        progressBarFill.style.width = `${progress}%`;
+      }
+      
+      // Функция для запуска таймера
+      function startTimer(totalSeconds, operationId) {
+        // Сохраняем глобально ID операции
+        window.operationId = operationId;
+        
+        // Обновляем общее время для прогресс-бара
+        totalTime = totalSeconds;
+        remainingTime = totalSeconds;
+        
+        const timerElement = document.getElementById('timer');
+        const waitingContainer = document.getElementById('waitingContainer');
+        
+        // Удаляем существующие кнопки повтора, если они есть
+        const existingRetryButton = document.querySelector('.retry-button');
+        if (existingRetryButton) {
+          existingRetryButton.remove();
+        }
+        
+        // Показываем контейнер ожидания
+        waitingContainer.style.display = 'block';
+        
+        // Инициализируем таймер
+        timerElement.textContent = formatTime(remainingTime);
+        updateProgressBar(totalTime, remainingTime);
+        
+        // Очищаем предыдущий интервал, если он есть
+        if (timerInterval) {
+          clearInterval(timerInterval);
+        }
+        
+        // Устанавливаем флаг, что запрос еще не выполнялся
+        requestAttempted = false;
+        
+        // Обновляем таймер каждую секунду
+        timerInterval = setInterval(() => {
+          remainingTime--;
+          timerElement.textContent = formatTime(remainingTime);
+          updateProgressBar(totalTime, remainingTime);
+          
+          // Когда таймер достигает 0
+          if (remainingTime <= 0) {
+            clearInterval(timerInterval);
+            
+            // Если запрос еще не был выполнен, делаем его
+            if (!requestAttempted) {
+              makeApiRequest(operationId);
+              requestAttempted = true; // Отмечаем, что запрос был выполнен
+            }
+          }
+        }, 1000);
+      }
+      
+      // Функция для выполнения API запроса
+      async function makeApiRequest(operationId) {
+        try {
+          // Добавляем операционный ID в URL как параметр запроса
+          const requestUrl = `https://api-libi.ru/webhook/api/figma?operation_id=${operationId}`;
+          
+          const response = await fetch(requestUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ошибка! статус: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          // Проверяем наличие времени ожидания в ответе
+          if (data.times) {
+            const waitTime = parseInt(data.times);
+            if (!isNaN(waitTime) && waitTime > 0) {
+              // Запускаем новый таймер с указанным временем
+              startTimer(waitTime, operationId);
+            } else {
+              // Отправляем данные плагину для обработки
+              parent.postMessage({ 
+                pluginMessage: { 
+                  type: 'process_data',
+                  data: data,
+                  operationId: operationId
+                }
+              }, '*');
+            }
+          } else {
+            // Отправляем данные плагину для обработки
+            parent.postMessage({ 
+              pluginMessage: { 
+                type: 'process_data',
+                data: data,
+                operationId: operationId
+              }
+            }, '*');
+          }
+        } catch (error) {
+          console.error('Ошибка при выполнении API запроса:', error);
+          showRetryButton(operationId);
+        }
+      }
+      
+      // Функция для отображения кнопки повтора
+      function showRetryButton(operationId) {
+        const waitingContainer = document.getElementById('waitingContainer');
+        
+        // Удаляем существующую кнопку повтора, если она есть
+        const existingRetryButton = document.querySelector('.retry-button');
+        if (existingRetryButton) {
+          existingRetryButton.remove();
+        }
+        
+        // Создаем новую кнопку
+        const retryButton = document.createElement('button');
+        retryButton.className = 'retry-button';
+        retryButton.textContent = 'Повторить запрос';
+        retryButton.onclick = () => {
+          makeApiRequest(operationId);
+        };
+        
+        // Добавляем кнопку в контейнер
+        waitingContainer.appendChild(retryButton);
+      }
+      
+      // Обработчик сообщений от плагина
+      window.onmessage = async (event) => {
+        const message = event.data.pluginMessage;
+        
+        if (!message) return;
+        
+        console.log('Получено сообщение от плагина:', message);
+        
+        try {
+          switch (message.type) {
+            case 'waiting':
+              updateUI({
+                type: 'waiting',
+                waitTime: message.waitTime,
+                itemCount: message.itemCount
+              });
+              
+              // Запускаем таймер с указанием operationId
+              if (message.operationId) {
+                operationId = message.operationId;
+                startTimer(message.waitTime, message.operationId);
+              } else {
+                startTimer(message.waitTime, operationId);
+              }
+              break;
+              
+            case 'show_retry_button':
+              // Отображаем кнопку повтора запроса
+              showRetryButton(message.operationId);
+              break;
+              
+            case 'retry_timer':
+              // Запускаем таймер заново с новым временем ожидания
+              startTimer(message.waitTime, message.operationId);
+              break;
+              
+            case 'complete':
+              updateUI({
+                type: 'complete',
+                message: message.message
+              });
+              // Очищаем таймер
+              if (timerInterval) {
+                clearInterval(timerInterval);
+              }
+              break;
+              
+            case 'error':
+              updateUI({
+                type: 'error',
+                message: message.message
+              });
+              // Очищаем таймер
+              if (timerInterval) {
+                clearInterval(timerInterval);
+              }
+              break;
+              
+            case 'getPrompt':
+              parent.postMessage({ 
+                pluginMessage: { 
+                  type: 'promptResponse', 
+                  prompt: currentPrompt 
+                }
+              }, '*');
+              break;
+          }
+        } catch (error) {
+          console.error('Ошибка при обработке сообщения:', error);
+          const errorMessage = document.querySelector('.error-message');
+          if (errorMessage) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'Произошла ошибка при обработке сообщения';
+          }
+        }
+      };
+      
+      // Обработчик выбора файла
+      document.getElementById('fileInput').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          selectedFile = file;
+          updateUI({ type: 'fileSelected' });
+        }
+      });
+      
+      // Обработчик изменения количества товаров
+      document.getElementById('itemsCount').addEventListener('input', (event) => {
+        itemsCount = parseInt(event.target.value) || 0;
+        updateUI({ type: 'itemsCountChanged' });
+      });
+      
+      // Обработчик изменения промпта
+      document.getElementById('promptInput').addEventListener('input', (event) => {
+        currentPrompt = event.target.value;
+      });
+      
+      // Обработчик отправки формы
+      document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        if (!selectedFile) {
+          updateUI({
+            type: 'error',
+            message: 'Пожалуйста, выберите файл'
+          });
+          return;
+        }
+        
+        if (!itemsCount) {
+          updateUI({
+            type: 'error',
+            message: 'Пожалуйста, укажите количество товаров'
+          });
+          return;
+        }
+        
+        try {
+          // Читаем содержимое файла
+          const arrayBuffer = await selectedFile.arrayBuffer();
+          
+          // Отправляем данные в плагин
+          parent.postMessage({
+            pluginMessage: {
+              type: 'process-excel',
+              file: arrayBuffer,
+              prompt: currentPrompt,
+              itemsCount: itemsCount
+            }
+          }, '*');
+          
+        } catch (error) {
+          console.error('Ошибка при обработке файла:', error);
+          updateUI({
+            type: 'error',
+            message: 'Ошибка при обработке файла: ' + error.message
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
